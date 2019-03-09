@@ -37,12 +37,18 @@ var config struct {
 
 func main() {
 	flag.StringVar(&config.Directory, "d", ".", "directory to watch for changes")
-	flag.StringVar(&config.Command, "c", "", "command to run and restart after build if blank will use .exe")
+	//flag.StringVar(&config.Command, "c", "", "command to run and restart after build if blank will use .exe")
 	flag.StringVar(&config.Pattern, "pattern", FilePatternNoBuilder, "pattern of watched files")
 	flag.BoolVar(&config.Recursive, "recursive", true, "watch all dirs. recursively")
 	flag.BoolVar(&config.Beep, "beep", true, " beep on failure")
 
 	flag.Parse()
+
+	if len(flag.Args()) > 0 {
+		config.Command = flag.Args()[0]
+	} else {
+		log.Println("Pass command name to watch after as first non-flag command-line argument")
+	}
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
