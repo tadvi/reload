@@ -37,15 +37,18 @@ var config struct {
 
 func main() {
 	flag.StringVar(&config.Directory, "d", ".", "directory to watch for changes")
-	//flag.StringVar(&config.Command, "c", "", "command to run and restart after build if blank will use .exe")
 	flag.StringVar(&config.Pattern, "pattern", FilePatternNoBuilder, "pattern of watched files")
 	flag.BoolVar(&config.Recursive, "recursive", true, "watch all dirs. recursively")
-	flag.BoolVar(&config.Beep, "beep", true, " beep on failure")
+	flag.BoolVar(&config.Beep, "beep", true, " beep on failure on Windows")
 
 	flag.Parse()
 
 	if len(flag.Args()) > 0 {
 		config.Command = flag.Args()[0]
+
+		// Add passed in command to patterns.
+		p := strings.TrimPrefix(config.Command, "./")
+		config.Pattern += "|" + p
 	} else {
 		log.Println("Pass command name to watch after as first non-flag command-line argument")
 	}
@@ -65,9 +68,10 @@ func main() {
 		fatalf("-d=... with directory is required.")
 	}
 
+	// If command is not provided then search for executable.
 	cmd := config.Command
 	if config.Command == "" {
-		// search for executable, only works on Windows.
+		// Search for executable, only works on Windows.
 		match, err := filepath.Glob(config.Directory + "/*.exe")
 		if err != nil {
 			fatalf("%v", err)
