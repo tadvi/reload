@@ -115,7 +115,7 @@ func killProcess(process *os.Process) {
 		logger.Fatal("Could not wait for child process. Aborting due to danger of infinite forks.")
 	}
 
-	logger.Println("Reloaded")
+	logger.Println(" --- Reloaded")
 }
 
 func main() {
